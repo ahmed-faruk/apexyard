@@ -263,9 +263,72 @@ Card `surfaceContainer` backgrounds must be spot-checked for contrast against `o
 
 ---
 
+## Addendum v3: Bold Hyper-Saturated Redesign
+
+**Status**: In Review
+**Author**: UI Designer (Nour)
+**Date**: 2026-07-02
+**Trigger**: v2 (implemented, PR `ahmed-faruk/todo-app#18`, merged `9e348b8`) was rejected by the user as "very very bad" across colors, layout, and visual energy. Reviewing the shipped dark-mode screenshot confirms the complaint is substantive, not taste: a large dead void with no focal point, and a palette so muted it barely reads as a color choice. `Refs #19`.
+
+### What v2 got wrong
+
+"Calm minimalism" was applied as *the entire palette going muted*, with no counterbalancing focal point — the opposite of the actual 2026 pattern, which pairs a minimal base with a **deliberately** vivid accent used sparingly. v2 had no such accent; the indigo seed was desaturated enough by M3's tonal algorithm that almost nothing in the UI read as "color" at all.
+
+### Research (new sources)
+
+- Hyper-saturated accents — vivid, intentional color pops against a minimal base — [Envato: Color Scheme Trends in Mobile App Design](https://elements.envato.com/learn/color-scheme-trends-in-mobile-app-design)
+- Dark mode with bold accents — high-contrast, not muted-on-dark — [DesignRush: 2026's Top App Color Schemes](https://www.designrush.com/best-designs/apps/trends/app-colors)
+- Soft Gradients 2.0 — subtle multi-stop gradients for hero/header areas — [UpDivision: UI Color Trends to Watch in 2026](https://updivision.com/blog/post/ui-color-trends-to-watch-in-2026)
+- Bold vibrant colors, strong color combinations for engagement — [TheBrandsBureau: 12 Mobile App Design Trends 2026](https://thebrandsbureau.com/mobile-app-design-trends-2026/)
+
+### What v3 keeps from v2 (not the complaint)
+
+Bottom-anchored primary action (now via FAB instead of a static bar — still thumb-reach), card-based todo rows, dark mode, `AppSpacing`/`AppRadius` tokens, all microinteractions (checkbox bounce, completed-opacity dim, entry/exit animation).
+
+### What v3 changes
+
+#### Color: Seed
+
+Replace `Colors.indigo` with a genuinely saturated **electric violet** seed, `Color(0xFF6D28D9)`, fed into the same `ColorScheme.fromSeed` mechanism (light + dark). This is a real hue/saturation shift, not a token-only change — the entire derived palette now reads as an intentional color choice in both brightness modes.
+
+#### Component: Gradient Hero Header (replaces flat `AppBar`)
+
+- Two-stop soft gradient, `colorScheme.primary` → a darker variant of the same hue (`HSLColor` lightness reduced ~15%), diagonal or vertical — subtle blend, not a harsh hard-edge band
+- Contains: "ToDo" title (`titleLarge`, on-primary-contrast text) + a live secondary count line ("N left") for visual interest and to fill the previously-dead top space
+- Height: enough to read as a hero element (taller than the old flat `AppBar`, roughly 1.5–2x), not full-screen — stays proportionate to a single-list utility app
+
+#### Component: Floating Action Button (replaces the always-visible bottom bar)
+
+- Standard Material `FloatingActionButton`, `colorScheme.primary` background, `Icons.add`, bottom-right, standard elevation
+- Tapping opens a `showModalBottomSheet` containing the add-todo `TextField` + submit — this replaces the v2 "always-visible bottom bar" with a real, findable interaction moment, still bottom-anchored (thumb reach preserved) but visually anchored rather than blending into the background
+- Rationale for the shift from "always visible" to "FAB + sheet": v2's pill-shaped bar was flagged as part of the "everything blends together" problem; a solid-color circular FAB is the single strongest visual anchor available in Material's own vocabulary for a primary action
+
+#### Component: Todo Card — Colored Accent
+
+- Left edge: 4px solid color bar — `colorScheme.primary` when active, a muted success tone (`Colors.green`-derived, tonal) when completed — replaces the flat monochrome `surfaceContainer`-only card from v2
+- Card body: keep `surfaceContainer` background + `AppRadius.lg` shape from v2 (that structural choice wasn't the complaint)
+
+#### Component: Segmented Filter — Filled Selection
+
+- Selected segment: solid `colorScheme.primary` fill with `colorScheme.onPrimary` text, replacing v2's muted tonal-grey selected state — gives the filter control actual visual presence instead of disappearing into the background
+
+#### Component: Empty State — Color Badge
+
+- Icon sits inside a circular badge: `colorScheme.primaryContainer` background, `colorScheme.onPrimaryContainer` icon color, ~72dp diameter — replaces the "icon floating alone in grey space" treatment from v2, directly closes the "big dead void" gap
+
+### Explicitly still out of scope
+
+Same as v2's addendum: no bento grid, no kinetic typography, no heavy glass blur, no AI/auth features. The fix is color/focal-point energy, not a wholesale pattern-language change.
+
+### Accessibility check
+
+`onPrimary`/`onPrimaryContainer` text-on-color pairings are M3's own contrast-vetted roles (not custom), so risk is low — spot-check both light and dark during QA, same approach as v1/v2. FAB retains Material's standard ≥48dp tap target by construction.
+
+---
+
 ## Approvals
 
 | Role | Name | Date | Status |
 |------|------|------|--------|
-| UI Designer | Nour | 2026-07-02 | Author (v1 + v2 addendum) |
-| Head of Design | Maha | 2026-07-02 | Approved direction (v1 + v2) — pending final `/approve-design` on the implementation PR |
+| UI Designer | Nour | 2026-07-02 | Author (v1 + v2 + v3 addenda) |
+| Head of Design | Maha | 2026-07-02 | Approved direction (v1 + v2 + v3) — pending final `/approve-design` on the implementation PR |
