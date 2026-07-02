@@ -9,7 +9,7 @@ This file is **distinct from `CLAUDE.md`** — `CLAUDE.md` is the framework-leve
 - `.claude/` — framework hooks, agents, rules, skills, settings.json
   - `.claude/hooks/` — 31 shell scripts (PreToolUse / PostToolUse / SessionStart)
   - `.claude/skills/` — 53 slash commands (one dir per skill, each with `SKILL.md`)
-  - `.claude/agents/` — 23 sub-agents: 5 utility (Rex code-reviewer, Hakim security-reviewer/auditor, Munir dep-auditor, Tariq PR-manager, Idris ticket-manager) + 18 dept-aligned agents across engineering / product / design / security / data
+  - `.claude/agents/` — 24 sub-agents: 5 utility (Rex code-reviewer, Hakim security-reviewer/auditor, Munir dep-auditor, Tariq PR-manager, Idris ticket-manager) + 19 dept-aligned agents across engineering / product / design / security / data
   - `.claude/rules/` — 11 modular rule files imported via `@.claude/rules/*.md` from `CLAUDE.md`
   - `.claude/settings.json` — hook wiring
 - `roles/` — 19 role definitions across Engineering, Product, Design, Security, Data
