@@ -200,9 +200,72 @@ None — token set, color-role mapping, and the empty-state sibling-widget const
 
 ---
 
+## Addendum v2: 2026 Mobile Design Trends
+
+**Status**: In Review
+**Author**: UI Designer (Nour)
+**Date**: 2026-07-02
+**Trigger**: user feedback that v1 (tokens + dark mode, same palette/layout) read as visually unchanged; direction expanded to apply current mobile-design-trend patterns, researched via web search.
+
+### Research sources
+
+- Calm, minimal, low-visual-noise UX — [UXPilot: 9 Mobile App Design Trends for 2026](https://uxpilot.ai/blogs/mobile-app-design-trends), [Envato: UX/UI design trends for 2026](https://elements.envato.com/learn/ux-ui-design-trends)
+- Bottom-anchored primary actions (thumb-reach) — [Muzli: What's Changing in Mobile App Design](https://muz.li/blog/whats-changing-in-mobile-app-design-ui-patterns-that-matter-in-2026/)
+- Card-based blocks, soft/organic "squircle" corner radii — [Midrocket: UI Design Trends for 2026](https://midrocket.com/en/guides/ui-design-trends-2026/), [WriterDock: Bento Grids & Beyond](https://writerdock.in/blog/bento-grids-and-beyond-7-ui-trends-dominating-web-design-2026)
+- Subtle glassmorphism, used for hierarchy not decoration — [Lucky Graphics: UI Design Trends 2026](https://lucky.graphics/learn/ui-design-trends-2026/)
+- Microinteractions as baseline expectation — [UXPilot: 9 Mobile App Design Trends for 2026](https://uxpilot.ai/blogs/mobile-app-design-trends)
+
+### Decision
+
+Keep the v1 token/dark-mode foundation (`ColorScheme.fromSeed`, indigo brand seed, `AppSpacing`/`AppRadius`) — it's still correct infrastructure regardless of visual style — and layer the following on top, translated to concrete, Flutter-feasible, single-screen-appropriate changes (no bento grids, no kinetic typography, no heavy glass blur — those don't fit a single-list utility app):
+
+### New tokens
+
+Add to `AppRadius` (`lib/theme/design_tokens.dart`):
+- `lg = 20.0` — todo-card corner radius ("squircle"-ish via a large consistent radius)
+- `pill = 999.0` — fully-rounded controls (segmented button, add-bar button/field)
+
+### Component: Bottom Add-Todo Bar (new — replaces the top add-todo row)
+
+- Position: pinned above the keyboard/safe-area at the bottom of the screen, not in the top `Column`
+- Structure: unchanged widgets (`TextField` + `FilledButton`), same `AppSpacing.md`/`sm` padding/gap — only the position changes
+- Shape: `TextField` border and `FilledButton` both use `AppRadius.pill`
+- Rationale: this is the most frequent user action; 2026 mobile-nav trend places frequent actions within thumb reach at the screen bottom. Filter control (infrequent, contextual) stays at the top — not moved, avoids scope creep into a bottom-sheet filter pattern
+
+### Component: Todo Card (replaces flat `ListTile` row styling)
+
+- Shape: `RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg))`
+- Background: `colorScheme.surfaceContainer` (tonal, distinct from `colorScheme.surface` screen background) — this is the "subtle glassmorphism-adjacent" depth cue without introducing actual blur/translucency, keeping legibility and avoiding the "style over substance" failure mode the research flags for over-applied glassmorphism
+- Spacing: `AppSpacing.sm` vertical gap between cards (visible separation, not edge-to-edge dividers)
+- Content: unchanged (checkbox, title, delete icon, drag handle) — only the container changes
+
+### Component: Pill Controls
+
+- `SegmentedButton` (filter) and the bottom bar's `FilledButton`/`TextField`: `AppRadius.pill` corner radius via `ButtonStyle.shape`/`InputDecoration.border`
+
+### Microinteractions (scoped to what's cheap and load-bearing, not decorative excess)
+
+1. **Checkbox toggle**: brief scale animation (`AnimatedScale`, ~150ms) + `HapticFeedback.lightImpact()` on toggle
+2. **Completed-todo dim**: `AnimatedOpacity` to ~0.6 alongside the existing strikethrough (both signal completion, opacity adds a felt transition instead of an instant flip)
+3. **New-todo entry**: fade+slide-in for a newly added card, implemented per-item (keyed `TweenAnimationBuilder`, not a full `AnimatedList` — avoids fighting `ReorderableListView`'s own animation machinery)
+4. **Delete**: fade-out before removal where feasible within the existing `ListView`/`ReorderableListView` structure
+
+### Explicitly out of scope for this addendum
+
+- Bento-grid layout — wrong shape for a linear todo list
+- Kinetic/animated typography — not appropriate for a utility app's task titles
+- Heavy glass blur (`BackdropFilter`) — legibility risk flagged directly in the research; tonal `surfaceContainer` achieves the depth cue without it
+- AI personalization, voice/biometric auth — out of scope for a local single-user app with no auth surface
+
+### Accessibility check
+
+Card `surfaceContainer` backgrounds must be spot-checked for contrast against `onSurface` text in both light and dark — same manual-check approach as v1's contrast spot-check, since `surfaceContainer` is one of M3's own contrast-vetted roles (not a custom color), so risk is low. Tap targets: cards must remain ≥48dp tall (checkbox + padding already ensures this, unaffected by the shape/background change).
+
+---
+
 ## Approvals
 
 | Role | Name | Date | Status |
 |------|------|------|--------|
-| UI Designer | Nour | 2026-07-02 | Author |
-| Head of Design | Maha | 2026-07-02 | Approved direction — pending final `/approve-design` on the implementation PR |
+| UI Designer | Nour | 2026-07-02 | Author (v1 + v2 addendum) |
+| Head of Design | Maha | 2026-07-02 | Approved direction (v1 + v2) — pending final `/approve-design` on the implementation PR |
