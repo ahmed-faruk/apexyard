@@ -76,6 +76,23 @@ projects:
       - android
     ticket_prefix: GH
 
+  - name: gls-school
+    repo: ahmed-faruk/gls-school
+    workspace: workspace/gls-school
+    docs: projects/gls-school
+    status: active
+    tier: P1
+    roles:
+      - product-manager
+      - ux-designer
+      - ui-designer
+      - tech-lead
+      - frontend-engineer
+      - qa-engineer
+    tags:
+      - customer-facing
+    ticket_prefix: GH
+
 # -----------------------------------------------------------------------------
 # Defaults
 # -----------------------------------------------------------------------------
